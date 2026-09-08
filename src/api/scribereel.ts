@@ -12,15 +12,26 @@ interface TranscriptionResponseDto {
 }
 
 interface ErrorResponseDto {
-  error: string;
+  error?: string;
 }
 
+const RATE_LIMIT_ERROR = 'Please wait before submitting another request.';
+
 async function parseJsonOrThrow<T>(response: Response): Promise<T> {
-  const data = (await response.json()) as T | ErrorResponseDto;
+  let data: T | ErrorResponseDto;
+
+  try {
+    data = (await response.json()) as T | ErrorResponseDto;
+  } catch {
+    throw new Error(!response.ok && response.status === 429 ? RATE_LIMIT_ERROR : 'Request failed');
+  }
 
   if (!response.ok) {
     const errorData = data as ErrorResponseDto;
-    throw new Error(errorData.error || 'Request failed');
+    const message = response.status === 429
+      ? errorData?.error || RATE_LIMIT_ERROR
+      : errorData?.error || 'Request failed';
+    throw new Error(message);
   }
 
   return data as T;
