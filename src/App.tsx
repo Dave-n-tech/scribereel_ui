@@ -10,7 +10,7 @@ type Mode = 'caption' | 'convert' | 'transcribe'
 function App() {
   const [mode, setMode] = useState<Mode>('caption')
   const [selectedStyle, setSelectedStyle] = useState<StyleName>('punch')
-  const [selectedFile, setSelectedFile] = useState<string | null>(null)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   return (

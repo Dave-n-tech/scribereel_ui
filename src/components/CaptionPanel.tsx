@@ -1,4 +1,6 @@
 import type { RefObject } from 'react'
+import { useState } from 'react'
+import { createCaption } from '../api/scribereel'
 import AnimatedSample, { type StyleName } from './AnimatedSample'
 import UploadZone from './UploadZone'
 
@@ -13,12 +15,30 @@ const styles: Array<{ name: StyleName; label: string; meta: string; sample: stri
 type CaptionPanelProps = {
   selectedStyle: StyleName
   onStyleChange: (style: StyleName) => void
-  selectedFile: string | null
-  onFileChange: (name: string | null) => void
+  selectedFile: File | null
+  onFileChange: (file: File | null) => void
   inputRef: RefObject<HTMLInputElement | null>
 }
 
 function CaptionPanel({ selectedStyle, onStyleChange, selectedFile, onFileChange, inputRef }: CaptionPanelProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null)
+
+  const handleSubmit = async () => {
+    if (!selectedFile) return
+    setIsSubmitting(true)
+    setError(null)
+    setDownloadUrl(null)
+    try {
+      setDownloadUrl(await createCaption(selectedFile, selectedStyle))
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : 'Unable to create captions')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return <section className="panel active caption-panel">
     <p className="panel-intro">Drop a vertical clip and get it back with captions burned in, timed word by word.</p>
     <div className="caption-layout">
@@ -32,7 +52,10 @@ function CaptionPanel({ selectedStyle, onStyleChange, selectedFile, onFileChange
         </div>
       </div>
       <div className="upload-section">
-        <UploadZone kind="video" fileName={selectedFile} onFile={onFileChange} inputRef={inputRef} />
+        <UploadZone kind="video" file={selectedFile} onFile={onFileChange} inputRef={inputRef} />
+        <button className="submit-button" type="button" disabled={!selectedFile || isSubmitting} onClick={handleSubmit}>{isSubmitting ? 'Creating captions...' : 'Create captions'}</button>
+        {error && <p className="form-error" role="alert">{error}</p>}
+        {downloadUrl && <a className="result-link caption-result-link" href={downloadUrl} download>Download captioned video</a>}
       </div>
     </div>
   </section>

@@ -1,16 +1,39 @@
 import type { RefObject } from 'react'
+import { useState } from 'react'
+import { convertToMp3 } from '../api/scribereel'
 import UploadZone from './UploadZone'
 
 type ConvertPanelProps = {
-  selectedFile: string | null
-  onFileChange: (name: string | null) => void
+  selectedFile: File | null
+  onFileChange: (file: File | null) => void
   inputRef: RefObject<HTMLInputElement | null>
 }
 
 function ConvertPanel({ selectedFile, onFileChange, inputRef }: ConvertPanelProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null)
+
+  const handleSubmit = async () => {
+    if (!selectedFile) return
+    setIsSubmitting(true)
+    setError(null)
+    setDownloadUrl(null)
+    try {
+      setDownloadUrl(await convertToMp3(selectedFile))
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : 'Unable to convert video')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return <section className="panel active">
     <p className="panel-intro">Strip the audio out of any clip and get back a clean MP3 — no captions, no re-encoding of the video.</p>
-    <UploadZone kind="audio" fileName={selectedFile} onFile={onFileChange} inputRef={inputRef} />
+    <UploadZone kind="audio" file={selectedFile} onFile={onFileChange} inputRef={inputRef} />
+    <button className="submit-button" type="button" disabled={!selectedFile || isSubmitting} onClick={handleSubmit}>{isSubmitting ? 'Converting...' : 'Convert to MP3'}</button>
+    {error && <p className="form-error" role="alert">{error}</p>}
+    {downloadUrl && <a className="result-link convert-result-link" href={downloadUrl} download>Download MP3</a>}
   </section>
 }
 

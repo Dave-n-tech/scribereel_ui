@@ -43,6 +43,17 @@ body { background: var(--canvas); color: var(--text-primary); font-family: 'Inst
 .dropzone-sub { color: var(--text-muted); font-size: 13px; }
 .dropzone-meta { display: flex; justify-content: center; gap: 14px; margin-top: 16px; color: var(--text-faint); font: 11px 'JetBrains Mono', monospace; }
 .file-input { display: none; }
+.submit-button { width: 100%; margin-top: 12px; padding: 11px 16px; border: 0; border-radius: 8px; background: var(--accent); color: #1a0d08; cursor: pointer; font-size: 14px; font-weight: 600; transition: background .15s ease, opacity .15s ease; }
+.submit-button:hover:not(:disabled) { background: #ff735a; }
+.submit-button:disabled { cursor: not-allowed; opacity: .45; }
+.form-error { margin: 10px 0 0; color: #ff9d8c; font-size: 13px; }
+.result-link { display: inline-block; margin-top: 12px; color: var(--success); font-size: 13px; font-weight: 600; }
+.caption-result-link { width: 100%; padding: 11px 16px; border: 1px solid var(--success); border-radius: 8px; background: rgba(110,231,183,.1); color: var(--success); text-align: center; text-decoration: none; transition: background .15s ease, color .15s ease; }
+.caption-result-link:hover { background: var(--success); color: #0d1714; }
+.caption-result-link:focus-visible { outline: 2px solid var(--success); outline-offset: 3px; }
+.convert-result-link { width: 100%; padding: 11px 16px; border: 1px solid var(--success); border-radius: 8px; background: rgba(110,231,183,.1); color: var(--success); text-align: center; text-decoration: none; transition: background .15s ease, color .15s ease; }
+.convert-result-link:hover { background: var(--success); color: #0d1714; }
+.convert-result-link:focus-visible { outline: 2px solid var(--success); outline-offset: 3px; }
 .transcript-preview { padding: 18px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text-muted); font-size: 13.5px; line-height: 1.7; }
 .cursor { display: inline-block; width: 2px; height: 14px; margin-left: 2px; background: var(--accent); vertical-align: middle; animation: blink 1s step-end infinite; }
 @keyframes blink { 50% { opacity: 0; } }
