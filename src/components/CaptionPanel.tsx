@@ -1,6 +1,6 @@
 import type { RefObject } from 'react'
 import { useState } from 'react'
-import { createCaption } from '../api/scribereel'
+import { createCaption, type JobStatus } from '../api/scribereel'
 import AnimatedSample, { type StyleName } from './AnimatedSample'
 import UploadZone from './UploadZone'
 
@@ -22,16 +22,18 @@ type CaptionPanelProps = {
 
 function CaptionPanel({ selectedStyle, onStyleChange, selectedFile, onFileChange, inputRef }: CaptionPanelProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [jobStatus, setJobStatus] = useState<JobStatus | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null)
 
   const handleSubmit = async () => {
     if (!selectedFile) return
     setIsSubmitting(true)
+    setJobStatus('PENDING')
     setError(null)
     setDownloadUrl(null)
     try {
-      setDownloadUrl(await createCaption(selectedFile, selectedStyle))
+      setDownloadUrl(await createCaption(selectedFile, selectedStyle, setJobStatus))
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : 'Unable to create captions')
     } finally {
@@ -53,7 +55,7 @@ function CaptionPanel({ selectedStyle, onStyleChange, selectedFile, onFileChange
       </div>
       <div className="upload-section">
         <UploadZone kind="video" file={selectedFile} onFile={onFileChange} inputRef={inputRef} />
-        <button className="submit-button" type="button" disabled={!selectedFile || isSubmitting} onClick={handleSubmit}>{isSubmitting ? 'Creating captions...' : 'Create captions'}</button>
+        <button className="submit-button" type="button" disabled={!selectedFile || isSubmitting} onClick={handleSubmit}>{isSubmitting ? jobStatus === 'PROCESSING' ? 'Processing captions...' : 'Queueing captions...' : 'Create captions'}</button>
         {error && <p className="form-error" role="alert">{error}</p>}
         {downloadUrl && <a className="result-link caption-result-link" href={downloadUrl} download>Download captioned video</a>}
       </div>

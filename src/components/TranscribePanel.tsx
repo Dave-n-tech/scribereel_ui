@@ -1,6 +1,6 @@
 import type { RefObject } from 'react'
 import { useState } from 'react'
-import { transcribe } from '../api/scribereel'
+import { transcribe, type JobStatus } from '../api/scribereel'
 import UploadZone from './UploadZone'
 
 type TranscribePanelProps = {
@@ -11,16 +11,18 @@ type TranscribePanelProps = {
 
 function TranscribePanel({ selectedFile, onFileChange, inputRef }: TranscribePanelProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [jobStatus, setJobStatus] = useState<JobStatus | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [transcriptText, setTranscriptText] = useState<string | null>(null)
 
   const handleSubmit = async () => {
     if (!selectedFile) return
     setIsSubmitting(true)
+    setJobStatus('PENDING')
     setError(null)
     setTranscriptText(null)
     try {
-      setTranscriptText(await transcribe(selectedFile))
+      setTranscriptText(await transcribe(selectedFile, setJobStatus))
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : 'Unable to transcribe file')
     } finally {
@@ -31,7 +33,7 @@ function TranscribePanel({ selectedFile, onFileChange, inputRef }: TranscribePan
   return <section className="panel active">
     <p className="panel-intro">Get a plain-text transcript from a video or audio file — for show notes, subtitles you'll edit yourself, or quick reference.</p>
     <UploadZone kind="transcript" file={selectedFile} onFile={onFileChange} inputRef={inputRef} />
-    <button className="submit-button" type="button" disabled={!selectedFile || isSubmitting} onClick={handleSubmit}>{isSubmitting ? 'Transcribing...' : 'Transcribe file'}</button>
+    <button className="submit-button" type="button" disabled={!selectedFile || isSubmitting} onClick={handleSubmit}>{isSubmitting ? jobStatus === 'PROCESSING' ? 'Transcribing...' : 'Queueing transcription...' : 'Transcribe file'}</button>
     {error && <p className="form-error" role="alert">{error}</p>}
     <div className="panel-label">Output preview</div>
     <div className="transcript-preview">{transcriptText ?? 'Wait for it — this is ScribeReel. Drop a clip and get the words back as plain text'}{!transcriptText && <span className="cursor" />}</div>
