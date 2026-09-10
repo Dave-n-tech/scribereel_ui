@@ -37,7 +37,13 @@ function TranscribePanel({ selectedFile, onFileChange, inputRef, limits }: Trans
     <button className="submit-button" type="button" disabled={!selectedFile || isSubmitting} onClick={handleSubmit}>{isSubmitting ? jobStatus === 'PROCESSING' ? 'Transcribing...' : 'Queueing transcription...' : 'Transcribe file'}</button>
     {error && <p className="form-error" role="alert">{error}</p>}
     <div className="panel-label">Output preview</div>
-    <div className="transcript-preview">{transcriptText ?? 'Wait for it — this is ScribeReel. Drop a clip and get the words back as plain text'}{!transcriptText && <span className="cursor" />}</div>
+    <textarea
+      className="transcript-preview"
+      aria-label="Transcript result"
+      value={transcriptText ?? ''}
+      placeholder="Drop a clip and get the words back as plain text"
+      onChange={(event) => setTranscriptText(event.target.value)}
+    />
   </section>
 }
 
