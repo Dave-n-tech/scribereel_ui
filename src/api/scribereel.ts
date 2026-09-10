@@ -21,8 +21,24 @@ interface ErrorResponseDto {
   error?: string;
 }
 
+export interface FeatureLimitsDto {
+  maxDurationSeconds: number;
+}
+
+export interface LimitsResponseDto {
+  maxFileSizeMb: number;
+  caption: FeatureLimitsDto;
+  convert: FeatureLimitsDto;
+  transcribe: FeatureLimitsDto;
+}
+
 const RATE_LIMIT_ERROR = 'Please wait before submitting another request.';
 const POLL_INTERVAL_MS = 2000;
+
+export async function getLimits(): Promise<LimitsResponseDto> {
+  const response = await fetch(`${API_BASE_URL}/api/limits`);
+  return parseJsonOrThrow<LimitsResponseDto>(response);
+}
 
 async function parseJsonOrThrow<T>(response: Response): Promise<T> {
   let data: T | ErrorResponseDto;

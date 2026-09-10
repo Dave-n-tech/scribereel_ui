@@ -1,5 +1,6 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './App.css'
+import { getLimits, type LimitsResponseDto } from './api/scribereel'
 import CaptionPanel from './components/CaptionPanel'
 import ConvertPanel from './components/ConvertPanel'
 import TranscribePanel from './components/TranscribePanel'
@@ -11,7 +12,12 @@ function App() {
   const [mode, setMode] = useState<Mode>('caption')
   const [selectedStyle, setSelectedStyle] = useState<StyleName>('punch')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [limits, setLimits] = useState<LimitsResponseDto | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    getLimits().then(setLimits).catch(() => setLimits(null))
+  }, [])
 
   return (
     <main className="app-shell">
@@ -25,9 +31,9 @@ function App() {
           ))}
         </nav>
 
-        {mode === 'caption' && <CaptionPanel selectedStyle={selectedStyle} onStyleChange={setSelectedStyle} selectedFile={selectedFile} onFileChange={setSelectedFile} inputRef={inputRef} />}
-        {mode === 'convert' && <ConvertPanel selectedFile={selectedFile} onFileChange={setSelectedFile} inputRef={inputRef} />}
-        {mode === 'transcribe' && <TranscribePanel selectedFile={selectedFile} onFileChange={setSelectedFile} inputRef={inputRef} />}
+        {mode === 'caption' && <CaptionPanel selectedStyle={selectedStyle} onStyleChange={setSelectedStyle} selectedFile={selectedFile} onFileChange={setSelectedFile} inputRef={inputRef} limits={limits} />}
+        {mode === 'convert' && <ConvertPanel selectedFile={selectedFile} onFileChange={setSelectedFile} inputRef={inputRef} limits={limits} />}
+        {mode === 'transcribe' && <TranscribePanel selectedFile={selectedFile} onFileChange={setSelectedFile} inputRef={inputRef} limits={limits} />}
         <p className="footer-note">Files are processed and deleted automatically. Nothing is stored.</p>
       </div>
     </main>

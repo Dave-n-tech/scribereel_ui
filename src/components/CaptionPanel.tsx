@@ -1,6 +1,6 @@
 import type { RefObject } from 'react'
 import { useState } from 'react'
-import { createCaption, type JobStatus } from '../api/scribereel'
+import { createCaption, type JobStatus, type LimitsResponseDto } from '../api/scribereel'
 import AnimatedSample, { type StyleName } from './AnimatedSample'
 import UploadZone from './UploadZone'
 
@@ -18,9 +18,10 @@ type CaptionPanelProps = {
   selectedFile: File | null
   onFileChange: (file: File | null) => void
   inputRef: RefObject<HTMLInputElement | null>
+  limits: LimitsResponseDto | null
 }
 
-function CaptionPanel({ selectedStyle, onStyleChange, selectedFile, onFileChange, inputRef }: CaptionPanelProps) {
+function CaptionPanel({ selectedStyle, onStyleChange, selectedFile, onFileChange, inputRef, limits }: CaptionPanelProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [jobStatus, setJobStatus] = useState<JobStatus | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -54,7 +55,7 @@ function CaptionPanel({ selectedStyle, onStyleChange, selectedFile, onFileChange
         </div>
       </div>
       <div className="upload-section">
-        <UploadZone kind="video" file={selectedFile} onFile={onFileChange} inputRef={inputRef} />
+        <UploadZone kind="video" file={selectedFile} onFile={onFileChange} inputRef={inputRef} maxFileSizeMb={limits?.maxFileSizeMb ?? null} featureLimits={limits?.caption ?? null} />
         <button className="submit-button" type="button" disabled={!selectedFile || isSubmitting} onClick={handleSubmit}>{isSubmitting ? jobStatus === 'PROCESSING' ? 'Processing captions...' : 'Queueing captions...' : 'Create captions'}</button>
         {error && <p className="form-error" role="alert">{error}</p>}
         {downloadUrl && <a className="result-link caption-result-link" href={downloadUrl} download>Download captioned video</a>}

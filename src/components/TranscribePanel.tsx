@@ -1,15 +1,16 @@
 import type { RefObject } from 'react'
 import { useState } from 'react'
-import { transcribe, type JobStatus } from '../api/scribereel'
+import { transcribe, type JobStatus, type LimitsResponseDto } from '../api/scribereel'
 import UploadZone from './UploadZone'
 
 type TranscribePanelProps = {
   selectedFile: File | null
   onFileChange: (file: File | null) => void
   inputRef: RefObject<HTMLInputElement | null>
+  limits: LimitsResponseDto | null
 }
 
-function TranscribePanel({ selectedFile, onFileChange, inputRef }: TranscribePanelProps) {
+function TranscribePanel({ selectedFile, onFileChange, inputRef, limits }: TranscribePanelProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [jobStatus, setJobStatus] = useState<JobStatus | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -32,7 +33,7 @@ function TranscribePanel({ selectedFile, onFileChange, inputRef }: TranscribePan
 
   return <section className="panel active">
     <p className="panel-intro">Get a plain-text transcript from a video or audio file — for show notes, subtitles you'll edit yourself, or quick reference.</p>
-    <UploadZone kind="transcript" file={selectedFile} onFile={onFileChange} inputRef={inputRef} />
+    <UploadZone kind="transcript" file={selectedFile} onFile={onFileChange} inputRef={inputRef} maxFileSizeMb={limits?.maxFileSizeMb ?? null} featureLimits={limits?.transcribe ?? null} />
     <button className="submit-button" type="button" disabled={!selectedFile || isSubmitting} onClick={handleSubmit}>{isSubmitting ? jobStatus === 'PROCESSING' ? 'Transcribing...' : 'Queueing transcription...' : 'Transcribe file'}</button>
     {error && <p className="form-error" role="alert">{error}</p>}
     <div className="panel-label">Output preview</div>

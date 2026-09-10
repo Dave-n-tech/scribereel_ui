@@ -1,15 +1,16 @@
 import type { RefObject } from 'react'
 import { useState } from 'react'
-import { convertToMp3, type JobStatus } from '../api/scribereel'
+import { convertToMp3, type JobStatus, type LimitsResponseDto } from '../api/scribereel'
 import UploadZone from './UploadZone'
 
 type ConvertPanelProps = {
   selectedFile: File | null
   onFileChange: (file: File | null) => void
   inputRef: RefObject<HTMLInputElement | null>
+  limits: LimitsResponseDto | null
 }
 
-function ConvertPanel({ selectedFile, onFileChange, inputRef }: ConvertPanelProps) {
+function ConvertPanel({ selectedFile, onFileChange, inputRef, limits }: ConvertPanelProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [jobStatus, setJobStatus] = useState<JobStatus | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -32,7 +33,7 @@ function ConvertPanel({ selectedFile, onFileChange, inputRef }: ConvertPanelProp
 
   return <section className="panel active">
     <p className="panel-intro">Strip the audio out of any clip and get back a clean MP3 — no captions, no re-encoding of the video.</p>
-    <UploadZone kind="audio" file={selectedFile} onFile={onFileChange} inputRef={inputRef} />
+    <UploadZone kind="audio" file={selectedFile} onFile={onFileChange} inputRef={inputRef} maxFileSizeMb={limits?.maxFileSizeMb ?? null} featureLimits={limits?.convert ?? null} />
     <button className="submit-button" type="button" disabled={!selectedFile || isSubmitting} onClick={handleSubmit}>{isSubmitting ? jobStatus === 'PROCESSING' ? 'Converting...' : 'Queueing conversion...' : 'Convert to MP3'}</button>
     {error && <p className="form-error" role="alert">{error}</p>}
     {downloadUrl && <a className="result-link convert-result-link" href={downloadUrl} download>Download MP3</a>}
