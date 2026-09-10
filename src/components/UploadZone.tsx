@@ -33,7 +33,7 @@ function UploadZone({ kind, file, onFile, inputRef, maxFileSizeMb, featureLimits
     <p className="upload-limits">{limitsText}</p>
     <button className="dropzone" type="button" onClick={() => inputRef.current?.click()} onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); chooseFile(event.dataTransfer.files[0]) }}>
       <span className="dropzone-icon">{icon}</span><span className="dropzone-title">{title}</span><span className="dropzone-sub">{file ? 'Ready to process' : subtitle}</span>
-      <span className="dropzone-meta"><span>MAX 100MB</span><span>·</span><span>{output}</span></span>
+      <span className="dropzone-meta"><span>{output}</span></span>
     </button>
     <input ref={inputRef} className="file-input" type="file" accept={isTranscript ? 'video/*,audio/*' : 'video/mp4,video/quicktime'} onChange={(event) => chooseFile(event.target.files?.[0])} />
   </>

@@ -32,7 +32,7 @@ function TranscribePanel({ selectedFile, onFileChange, inputRef, limits }: Trans
   }
 
   return <section className="panel active">
-    <p className="panel-intro">Get a plain-text transcript from a video or audio file — for show notes, subtitles you'll edit yourself, or quick reference.</p>
+    <p className="panel-intro">Get a plain-text transcript from a video or audio file — for show notes, subtitles, or quick reference.</p>
     <UploadZone kind="transcript" file={selectedFile} onFile={onFileChange} inputRef={inputRef} maxFileSizeMb={limits?.maxFileSizeMb ?? null} featureLimits={limits?.transcribe ?? null} />
     <button className="submit-button" type="button" disabled={!selectedFile || isSubmitting} onClick={handleSubmit}>{isSubmitting ? jobStatus === 'PROCESSING' ? 'Transcribing...' : 'Queueing transcription...' : 'Transcribe file'}</button>
     {error && <p className="form-error" role="alert">{error}</p>}

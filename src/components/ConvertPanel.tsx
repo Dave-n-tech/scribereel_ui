@@ -32,7 +32,7 @@ function ConvertPanel({ selectedFile, onFileChange, inputRef, limits }: ConvertP
   }
 
   return <section className="panel active">
-    <p className="panel-intro">Strip the audio out of any clip and get back a clean MP3 — no captions, no re-encoding of the video.</p>
+    <p className="panel-intro">Strip the audio out of any clip and get back a clean MP3.</p>
     <UploadZone kind="audio" file={selectedFile} onFile={onFileChange} inputRef={inputRef} maxFileSizeMb={limits?.maxFileSizeMb ?? null} featureLimits={limits?.convert ?? null} />
     <button className="submit-button" type="button" disabled={!selectedFile || isSubmitting} onClick={handleSubmit}>{isSubmitting ? jobStatus === 'PROCESSING' ? 'Converting...' : 'Queueing conversion...' : 'Convert to MP3'}</button>
     {error && <p className="form-error" role="alert">{error}</p>}
