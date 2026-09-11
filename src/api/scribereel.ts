@@ -35,6 +35,14 @@ export interface LimitsResponseDto {
 const RATE_LIMIT_ERROR = 'Please wait before submitting another request.';
 const POLL_INTERVAL_MS = 2000;
 
+function formatDurationError(message: string): string {
+  return message.replace(/(\d+(?:\.\d+)?)\s+seconds?\b/gi, (_, seconds: string) => {
+    const minutes = Number(seconds) / 60;
+    const formattedMinutes = Number.isInteger(minutes) ? minutes.toString() : minutes.toFixed(1);
+    return `${formattedMinutes} ${minutes === 1 ? 'minute' : 'minutes'}`;
+  });
+}
+
 export async function getLimits(): Promise<LimitsResponseDto> {
   const response = await fetch(`${API_BASE_URL}/api/limits`);
   return parseJsonOrThrow<LimitsResponseDto>(response);
@@ -53,7 +61,7 @@ async function parseJsonOrThrow<T>(response: Response): Promise<T> {
     const errorData = data as ErrorResponseDto;
     const message =
       response.status === 429 ? errorData?.error || RATE_LIMIT_ERROR : errorData?.error || 'Request failed';
-    throw new Error(message);
+    throw new Error(formatDurationError(message));
   }
 
   return data as T;
@@ -88,7 +96,7 @@ async function pollJobUntilSettled(
       return data;
     }
     if (data.status === 'FAILED') {
-      throw new Error(data.error || 'Processing failed. Please try again.');
+      throw new Error(formatDurationError(data.error || 'Processing failed. Please try again.'));
     }
 
     await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
