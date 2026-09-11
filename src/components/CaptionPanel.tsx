@@ -55,6 +55,7 @@ function CaptionPanel({ selectedStyle, onStyleChange, selectedFile, onFileChange
         </div>
       </div>
       <div className="upload-section">
+        {isSubmitting && <p className="processing-note" role="status">Captioning may take a few minutes. You can leave this page open while your video is being processed.</p>}
         <UploadZone kind="video" file={selectedFile} onFile={onFileChange} inputRef={inputRef} maxFileSizeMb={limits?.maxFileSizeMb ?? null} featureLimits={limits?.caption ?? null} />
         <button className="submit-button" type="button" disabled={!selectedFile || isSubmitting} onClick={handleSubmit}>{isSubmitting ? jobStatus === 'PROCESSING' ? 'Processing captions...' : 'Queueing captions...' : 'Create captions'}</button>
         {error && <p className="form-error" role="alert">{error}</p>}
